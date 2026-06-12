@@ -1956,8 +1956,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraFollow
   target: {fileID: 144317062}
-  height: 8
-  distance: 4
+  height: 15
+  distance: 20
 --- !u!1001 &1060974590
 PrefabInstance:
   m_ObjectHideFlags: 0
