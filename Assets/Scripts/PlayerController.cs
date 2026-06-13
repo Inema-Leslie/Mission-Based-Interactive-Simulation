@@ -2,12 +2,12 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 // This script moves Kagabo around the world
-// It needs a CharacterController component on the same GameObject
+
 [RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour
 {
     // Movement speed — you can change this in the Inspector
-    public float moveSpeed = 4f;
+    public float moveSpeed = 9f;
 
     // Is the player allowed to move right now?
     private bool _canMove = true;
