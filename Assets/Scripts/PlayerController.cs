@@ -1,54 +1,49 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-// This script moves Kagabo around the world
-
 [RequireComponent(typeof(CharacterController))]
 public class PlayerController : MonoBehaviour
 {
-    // Movement speed — you can change this in the Inspector
     public float moveSpeed = 9f;
+    public float stopDistance = 1f;
 
-    // Is the player allowed to move right now?
     private bool _canMove = true;
-
-    // These are set automatically
     private CharacterController _controller;
     private PlayerInputActions _inputActions;
     private Vector2 _moveInput;
 
+    private Vector3 _tapTarget;
+    private bool _hasTapTarget = false;
+
+    private Camera _cam;
+
     void Awake()
     {
-        // Get the CharacterController on this GameObject
         _controller = GetComponent<CharacterController>();
-
-        // Set up the input system
         _inputActions = new PlayerInputActions();
+        _cam = Camera.main;
     }
 
     void OnEnable()
     {
-        // Start listening for input
         _inputActions.Player.Enable();
         _inputActions.Player.Move.performed += OnMove;
-        _inputActions.Player.Move.canceled  += OnMoveStopped;
+        _inputActions.Player.Move.canceled += OnMoveStopped;
     }
 
     void OnDisable()
     {
-        // Stop listening for input
         _inputActions.Player.Move.performed -= OnMove;
-        _inputActions.Player.Move.canceled  -= OnMoveStopped;
+        _inputActions.Player.Move.canceled -= OnMoveStopped;
         _inputActions.Player.Disable();
     }
 
-    // Called when player presses a movement key
     void OnMove(InputAction.CallbackContext context)
     {
         _moveInput = context.ReadValue<Vector2>();
+        _hasTapTarget = false; // keyboard overrides tap
     }
 
-    // Called when player releases movement key
     void OnMoveStopped(InputAction.CallbackContext context)
     {
         _moveInput = Vector2.zero;
@@ -56,26 +51,71 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        // Only move if movement is allowed
         if (!_canMove) return;
 
-        // Convert 2D input to 3D movement (top-down)
-        Vector3 moveDirection = new Vector3(_moveInput.x, 0, _moveInput.y);
+        DetectTap();
 
-        // Move the character
+        Vector3 moveDirection = Vector3.zero;
+
+        if (_moveInput != Vector2.zero)
+        {
+            
+            moveDirection = new Vector3(_moveInput.x, 0, _moveInput.y);
+        }
+        else if (_hasTapTarget)
+        {
+            
+            Vector3 toTarget = _tapTarget - transform.position;
+            toTarget.y = 0;
+
+            if (toTarget.magnitude > stopDistance)
+            {
+                moveDirection = toTarget.normalized;
+            }
+            else
+            {
+                _hasTapTarget = false; // arrived
+            }
+        }
+
         _controller.Move(moveDirection * moveSpeed * Time.deltaTime);
-
-        // Apply gravity so Kagabo stays on the ground
         _controller.Move(Vector3.down * 9.81f * Time.deltaTime);
 
-        // Rotate Kagabo to face the direction he's moving
         if (moveDirection != Vector3.zero)
         {
             transform.rotation = Quaternion.LookRotation(moveDirection);
         }
     }
 
-    // Call this to stop or allow player movement
+    void DetectTap()
+    {
+        bool tapped = false;
+        Vector2 screenPos = Vector2.zero;
+
+      
+        if (Touchscreen.current != null && Touchscreen.current.primaryTouch.press.wasPressedThisFrame)
+        {
+            tapped = true;
+            screenPos = Touchscreen.current.primaryTouch.position.ReadValue();
+        }
+       
+        else if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
+        {
+            tapped = true;
+            screenPos = Mouse.current.position.ReadValue();
+        }
+
+        if (tapped && _cam != null)
+        {
+            Ray ray = _cam.ScreenPointToRay(screenPos);
+            if (Physics.Raycast(ray, out RaycastHit hit, 1000f))
+            {
+                _tapTarget = hit.point;
+                _hasTapTarget = true;
+            }
+        }
+    }
+
     public void SetInputEnabled(bool enabled)
     {
         _canMove = enabled;

@@ -5,7 +5,7 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/AerialIntro.unity
     guid: f900b5170bbfa284b89f799cf526e3c7
   - enabled: 1

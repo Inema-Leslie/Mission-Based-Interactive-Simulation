@@ -1,7 +1,7 @@
 using UnityEngine;
 using TMPro;
 
-// This script keeps the book count text updated
+
 public class BookCountUI : MonoBehaviour
 {
     
@@ -9,10 +9,9 @@ public class BookCountUI : MonoBehaviour
 
     void Update()
     {
-        // Check if GameManager exists
         if (GameManager.Instance != null)
         {
-            // Update the text every frame
+            
             bookCountText.text = "Books: " + GameManager.Instance.totalBooks;
         }
     }

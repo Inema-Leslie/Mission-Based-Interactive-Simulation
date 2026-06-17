@@ -1,10 +1,10 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-// When Kagabo walks into this zone, load the next scene
+
 public class SceneTransitionZone : MonoBehaviour
 {
-    public string sceneToLoad = "TheJourney";
+    public string sceneToLoad = "Kagabosjourney";
 
     private void OnTriggerEnter(Collider other)
     {
